@@ -1,4 +1,4 @@
-/* RFM69 library and code by Felix Rusu - felix@lowpowerlab.com
+  /* RFM69 library and code by Felix Rusu - felix@lowpowerlab.com
 // Get libraries at: https://github.com/LowPowerLab/
 // Make sure you adjust the settings in the configuration section below !!!
 // **********************************************************************************
@@ -34,14 +34,14 @@
 //*********************************************************************************************
 // *********** IMPORTANT SETTINGS - YOU MUST CHANGE/ONFIGURE TO FIT YOUR HARDWARE *************
 //*********************************************************************************************
-#define NETWORKID 100 // The same on all nodes that talk to each other
-#define NODEID 7 // The unique identifier of this node
-#define RECEIVER 100 // The recipient of packets
+#define NETWORKID 666 // The same on all nodes that talk to each other
+#define NODEID 5 // The unique identifier of this node
+#define RECEIVER 42 // The recipient of packets
 //Match frequency to the hardware version of the radio on your Feather
 #define FREQUENCY RF69_433MHZ
 //#define FREQUENCY RF69_868MHZ
 //#define FREQUENCY RF69_915MHZ
-#define ENCRYPTKEY "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
+#define ENCRYPTKEY "OPBLOPTROPSECURE" //exactly the same 16 characters/bytes on all nodes!
 #define IS_RFM69HCW true // set to 'true' if you are using an RFM69HCW module
 //*********************************************************************************************
 #define SERIAL_BAUD 115200
@@ -98,6 +98,11 @@ if (radio.receiveDone())
   {
   // une trame a été recue
   // TODO : depiler les données de la trame
+  int i = 0;
+   for ( i= 0; i < radio.DATALEN; ++ i) {
+     Serial.print(radio.DATA[i], DEC);
+     Serial.print("\t"); 
+   }
   
   Serial.print(F("Received Frame "));
   if (radio.ACKRequested())
@@ -109,6 +114,8 @@ if (radio.receiveDone())
     {
     Serial.println("NO ACK"); 
     }
+      Serial.print(radioPacketLen);
+      Serial.print(sizeof(radiopacket));      
   Blink(LED, 40, 1);  
   }
 
@@ -135,16 +142,18 @@ if (loopCounter > 2000)
   radiopacket[9] = 0;
   radiopacket[10] = 0;
   radiopacket[11] = 0;
+  radiopacket[12] = 66;
   radioPacketLen = 15;
   
   //  
   if (radio.sendWithRetry(RECEIVER, radiopacket, radioPacketLen)) 
     { //target node Id, message as string or byte array, message length
     Serial.print("OK >");
-    Blink(LED, 40, 3); //blink LED 3 times, 50ms between blinks
+    Blink(LED, 10, 3); //blink LED 3 times, 50ms between blinks
     }
   else
     {
+          //Blink(LED, 40, 20); //blink LED 3 times, 50ms between blinks
     Serial.print("FAIL >");  
     }
 
@@ -184,4 +193,3 @@ for (byte i=0; i<loops; i++)
   delay(DELAY_MS);
   }
 }
-
