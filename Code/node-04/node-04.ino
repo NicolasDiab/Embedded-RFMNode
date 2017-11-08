@@ -1,3 +1,4 @@
+
   /* RFM69 library and code by Felix Rusu - felix@lowpowerlab.com
 // Get libraries at: https://github.com/LowPowerLab/
 // Make sure you adjust the settings in the configuration section below !!!
@@ -31,12 +32,13 @@
 // **********************************************************************************/
 #include <RFM69.h> //get it here: https://www.github.com/lowpowerlab/rfm69
 #include <SPI.h>
+#include <ArduinoJson.h>
 //*********************************************************************************************
 // *********** IMPORTANT SETTINGS - YOU MUST CHANGE/ONFIGURE TO FIT YOUR HARDWARE *************
 //*********************************************************************************************
 #define NETWORKID 666 // The same on all nodes that talk to each other
-#define NODEID 5 // The unique identifier of this node
-#define RECEIVER 42 // The recipient of packets
+#define NODEID 4 // The unique identifier of this node
+#define RECEIVER 1 // The recipient of packets
 //Match frequency to the hardware version of the radio on your Feather
 #define FREQUENCY RF69_433MHZ
 //#define FREQUENCY RF69_868MHZ
