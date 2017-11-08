@@ -57,120 +57,91 @@ RFM69 radio = RFM69(RFM69_CS, RFM69_IRQ, IS_RFM69HCW, RFM69_IRQN);
 
 
 void setup() {
-//while (!Serial); // wait until serial console is open, remove if not tethered to computer. Delete this line on ESP8266
-Serial.begin(SERIAL_BAUD);
-Serial.println("Uart init done. Starting Init.");
-// Hard Reset the RFM module
-pinMode(RFM69_RST, OUTPUT);
-digitalWrite(RFM69_RST, HIGH);
-delay(100);
-digitalWrite(RFM69_RST, LOW);
-delay(100);
-// Initialize radio
-
-radio.initialize(FREQUENCY,NODEID,NETWORKID);
-if (IS_RFM69HCW) {
-radio.setHighPower(); // Only for RFM69HCW & HW!
-}
-radio.setPowerLevel(31); // power output ranges from 0 (5dBm) to 31 (20dBm)
-radio.encrypt(ENCRYPTKEY);
-pinMode(LED, OUTPUT);
-Serial.print("Radio Init done. Transmitting at ");
-Serial.print(FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
-Serial.println(" MHz");
-}
-
-
-//====================================================================
-void loop() {
-char radiopacket[65];
-unsigned char radioPacketLen;
-
-
-
-//=================================
-// Test si un paquet est disponible
-//=================================
-if (radio.receiveDone())
-  {
-  // une trame a été recue
-  // depile les données de la trame à partir du json
-  // analyse le numéro du node de destination
-  // envoie le message au node de destination
+  //while (!Serial); // wait until serial console is open, remove if not tethered to computer. Delete this line on ESP8266
+  Serial.begin(SERIAL_BAUD);
+  Serial.println("Uart init done. Starting Init.");
+  // Hard Reset the RFM module
+  pinMode(RFM69_RST, OUTPUT);
+  digitalWrite(RFM69_RST, HIGH);
+  delay(100);
+  digitalWrite(RFM69_RST, LOW);
+  delay(100);
+  // Initialize radio
   
-  int i = 0;
-   for ( i= 0; i < radio.DATALEN; ++ i) {
-     Serial.print(radio.DATA[i], DEC);
-     Serial.print("\t"); 
-   }
-  
-  Serial.print(F("Received Frame "));
-  if (radio.ACKRequested())
-    {
-    radio.sendACK();
-    Serial.println("Sending ACK");
-    }
-  else 
-    {
-    Serial.println("NO ACK"); 
-    }
-      Serial.print(radioPacketLen);
-      Serial.print(sizeof(radiopacket));
-
-  //==== On construit une trame arbitraire pour test
-  radiopacket[0] = 01;
-  radiopacket[1] = radio.readTemperature(4); 
-  radiopacket[2] = packetnum >> 8;  // Les poids forts
-  radiopacket[3] = packetnum ;      // Les poids faibles
-  radiopacket[4] = 00;
-  radiopacket[5] = 255;
-
-  radiopacket[6] = 11;
-  radiopacket[7] = 22;
-  radiopacket[8] = 33;
-  radiopacket[9] = 0;
-  radiopacket[10] = 0;
-  radiopacket[11] = 0;
-  radiopacket[12] = 66;
-  radioPacketLen = 15;
-  
-  //  
-  if (radio.sendWithRetry(radio.DATA[1], radio.DATA, radioPacketLen)) 
-    { //target node Id, message as string or byte array, message length
-    Serial.print("OK >");
-    Blink(LED, 10, 3); //blink LED 3 times, 50ms between blinks
-    }
-  else
-    {
-          //Blink(LED, 40, 20); //blink LED 3 times, 50ms between blinks
-    Serial.print("FAIL >");  
-    }
-  
-  Serial.print("Sent ["); 
-  for (int i=0; i< radioPacketLen; i++)
-    {
-    Serial.print((unsigned char) radio.DATA[i], DEC); 
-    Serial.print(",");
-    }
-  Serial.println("]");
-  
-  Blink(LED, 40, 1);  
+  radio.initialize(FREQUENCY,NODEID,NETWORKID);
+  if (IS_RFM69HCW) {
+  radio.setHighPower(); // Only for RFM69HCW & HW!
   }
-
-Serial.flush(); //make sure all serial data is clocked out before sleeping the MCU
-delay(1);
+  radio.setPowerLevel(31); // power output ranges from 0 (5dBm) to 31 (20dBm)
+  radio.encrypt(ENCRYPTKEY);
+  pinMode(LED, OUTPUT);
+  Serial.print("Radio Init done. Transmitting at ");
+  Serial.print(FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
+  Serial.println(" MHz");
 }
 
 
+//============================= Main loop =======================================
+void loop() {
+  unsigned char messageLength;
+  unsigned char nodeDestination;
+
+  //=================================
+  // Test si un paquet est disponible
+  //=================================
+  if (radio.receiveDone()) {
+    // depile les données de la trame à partir du json
+    // analyse le numéro du node de destination
+    nodeDestination = radio.DATA[1];
+
+    // affiche le message reçu
+    int i = 0;
+    for ( i= 0; i < radio.DATALEN; ++ i) {
+      Serial.print(radio.DATA[i], DEC);
+      Serial.print("\t"); 
+    }
+
+    // envoie un ACK
+    Serial.print(F("Received Frame "));
+    if (radio.ACKRequested()) {
+      radio.sendACK();
+      Serial.println("Sending ACK");
+    } else {
+      Serial.println("NO ACK"); 
+    }
+  
+    // redirige le message au node de destination
+    messageLength = 15;
+
+     //parameters : target node Id, message as string or byte array, message length
+    if (radio.sendWithRetry(nodeDestination, radio.DATA, messageLength)) {
+      Serial.print("OK >");
+      Blink(LED, 10, 3); //blink LED 3 times, 10ms between blinks
+    } else {
+      Serial.print("FAIL >");  
+    }
+    
+    Serial.print("Message sent ["); 
+    for (int i=0; i< messageLength; i++) {
+      Serial.print((unsigned char) radio.DATA[i], DEC); 
+      Serial.print(",");
+    }
+    Serial.println("]");
+  } // end receiveDone
+
+  Serial.flush(); //make sure all serial data is clocked out before sleeping the MCU
+  delay(1);
+  
+} //end loop
 
 
-void Blink(byte PIN, byte DELAY_MS, byte loops)
-{
-for (byte i=0; i<loops; i++)
-  {
-  digitalWrite(PIN,HIGH);
-  delay(DELAY_MS);
-  digitalWrite(PIN,LOW);
-  delay(DELAY_MS);
+// ========= Utility functions ============
+
+void Blink(byte PIN, byte DELAY_MS, byte loops) {
+  for (byte i=0; i<loops; i++) {
+    digitalWrite(PIN,HIGH);
+    delay(DELAY_MS);
+    digitalWrite(PIN,LOW);
+    delay(DELAY_MS);
   }
 }
