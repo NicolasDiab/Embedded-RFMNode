@@ -35,8 +35,8 @@
 // *********** IMPORTANT SETTINGS - YOU MUST CHANGE/ONFIGURE TO FIT YOUR HARDWARE *************
 //*********************************************************************************************
 #define NETWORKID 666 // The same on all nodes that talk to each other
-#define NODEID 5 // The unique identifier of this node
-#define RECEIVER 42 // The recipient of packets
+#define NODEID 2 // The unique identifier of this node
+#define RECEIVER 1 // The recipient of packets
 //Match frequency to the hardware version of the radio on your Feather
 #define FREQUENCY RF69_433MHZ
 //#define FREQUENCY RF69_868MHZ
@@ -129,8 +129,8 @@ if (loopCounter > 2000)
   packetnum ++;
 
   //==== On construit une trame arbitraire pour test
-  radiopacket[0] = 01;
-  radiopacket[1] = radio.readTemperature(4); 
+  radiopacket[0] = 2;
+  radiopacket[1] = 4; 
   radiopacket[2] = packetnum >> 8;  // Les poids forts
   radiopacket[3] = packetnum ;      // Les poids faibles
   radiopacket[4] = 00;
