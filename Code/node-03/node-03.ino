@@ -129,72 +129,70 @@ void loop() {
   //======================================
   //Tous les 2000 passages ..
   //
-//  if (loopCounter > 2000)
-//  {
-//    Serial.println("---------- Start Send -------------");
-//
-//    subLoopCounter ++;
-//    packetnum ++;
-//    StaticJsonBuffer<512> jsonBuffer;
-//
-//    JsonObject& root = jsonBuffer.createObject();
-//    root["RECIPIENT_ID"] = 4;
-//    root["SENDER_ID"] = 4;
-//    //root["TEST"] = "Je suis josephine ange gardien";
-//    root["TIMESTAMP"] = "1351824120";
-//    root["MESSAGE"] = "Bitch test test22";
-//
-//    int lenght = root.measureLength();
-//    Serial.println(lenght);
-//    char buffer[512];
-//    root.printTo(buffer);
-//    Serial.println(sizeof(buffer));
-//
-//
-//
-//
-//    //==== On construit une trame arbitraire pour test
-//    //    radiopacket[0] = 01;
-//    //    radiopacket[1] = radio.readTemperature(4);
-//    //    radiopacket[2] = packetnum >> 8;  // Les poids forts
-//    //    radiopacket[3] = packetnum ;      // Les poids faibles
-//    //    radiopacket[4] = 00;
-//    //    radiopacket[5] = 255;
-//    //
-//    //    radiopacket[6] = 11;
-//    //    radiopacket[7] = 22;
-//    //    radiopacket[8] = 33;
-//    //    radiopacket[9] = 0;
-//    //    radiopacket[10] = 0;
-//    //    radiopacket[11] = 0;
-//    //    radiopacket[12] = 66;
-//    //    radioPacketLen = 15;
-//
-//    //
-//    if (radio.sendWithRetry(RECEIVER, buffer, 87))
-//    { //target node Id, message as string or byte array, message length
-//      Serial.print("OK >");
-//      Blink(LED, 10, 3); //blink LED 3 times, 50ms between blinks
-//    }
-//    else
-//    {
-//      //Blink(LED, 40, 20); //blink LED 3 times, 50ms between blinks
-//      Serial.print("FAIL >");
-//    }
-//
-//
-//
-//    Serial.print("[");   Serial.print(subLoopCounter);
-//    loopCounter = 0;
-//    Serial.print("] Send ");
-//
-//    root.printTo(Serial);
-//
-//    //Dump des registres RADIO
-//    //radio.readAllRegs();
-//    Serial.println("--------- End Send --------------");
-//
-//  }
+  if (loopCounter > 2000)
+  {
+    Serial.println("---------- Start Send -------------");
+
+    subLoopCounter ++;
+    packetnum ++;
+    StaticJsonBuffer<512> jsonBuffer;
+
+    JsonObject& root = jsonBuffer.createObject();
+    root["R"] = 4;
+    root["S"] = 4;
+    root["M"] = "Bitch test test22";
+
+    int lenght = root.measureLength();
+    Serial.println(lenght);
+    char buffer[512];
+    root.printTo(buffer);
+    Serial.println(sizeof(buffer));
+
+
+
+
+    //==== On construit une trame arbitraire pour test
+    //    radiopacket[0] = 01;
+    //    radiopacket[1] = radio.readTemperature(4);
+    //    radiopacket[2] = packetnum >> 8;  // Les poids forts
+    //    radiopacket[3] = packetnum ;      // Les poids faibles
+    //    radiopacket[4] = 00;
+    //    radiopacket[5] = 255;
+    //
+    //    radiopacket[6] = 11;
+    //    radiopacket[7] = 22;
+    //    radiopacket[8] = 33;
+    //    radiopacket[9] = 0;
+    //    radiopacket[10] = 0;
+    //    radiopacket[11] = 0;
+    //    radiopacket[12] = 66;
+    //    radioPacketLen = 15;
+
+    //
+    if (radio.sendWithRetry(RECEIVER, buffer, 87))
+    { //target node Id, message as string or byte array, message length
+      Serial.print("OK >");
+      Blink(LED, 10, 3); //blink LED 3 times, 50ms between blinks
+    }
+    else
+    {
+      //Blink(LED, 40, 20); //blink LED 3 times, 50ms between blinks
+      Serial.print("FAIL >");
+    }
+
+
+
+    Serial.print("[");   Serial.print(subLoopCounter);
+    loopCounter = 0;
+    Serial.print("] Send ");
+
+    root.printTo(Serial);
+
+    //Dump des registres RADIO
+    //radio.readAllRegs();
+    Serial.println("--------- End Send --------------");
+
+  }
 
 
   Serial.flush(); //make sure all serial data is clocked out before sleeping the MCU
